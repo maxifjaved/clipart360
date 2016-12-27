@@ -14,17 +14,9 @@ exports.load = load;
 exports.login = login;
 exports.logout = logout;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _constants = require('../constants');
 
-var LOAD = 'redux-example/auth/LOAD';
-var LOAD_SUCCESS = 'redux-example/auth/LOAD_SUCCESS';
-var LOAD_FAIL = 'redux-example/auth/LOAD_FAIL';
-var LOGIN = 'redux-example/auth/LOGIN';
-var LOGIN_SUCCESS = 'redux-example/auth/LOGIN_SUCCESS';
-var LOGIN_FAIL = 'redux-example/auth/LOGIN_FAIL';
-var LOGOUT = 'redux-example/auth/LOGOUT';
-var LOGOUT_SUCCESS = 'redux-example/auth/LOGOUT_SUCCESS';
-var LOGOUT_FAIL = 'redux-example/auth/LOGOUT_FAIL';
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var initialState = {
   loaded: false
@@ -35,47 +27,47 @@ function reducer() {
   var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   switch (action.type) {
-    case LOAD:
+    case _constants.AUTH_LOAD:
       return (0, _extends3.default)({}, state, {
         loading: true
       });
-    case LOAD_SUCCESS:
+    case _constants.AUTH_LOAD_SUCCESS:
       return (0, _extends3.default)({}, state, {
         loading: false,
         loaded: true,
         user: action.result
       });
-    case LOAD_FAIL:
+    case _constants.AUTH_LOAD_FAIL:
       return (0, _extends3.default)({}, state, {
         loading: false,
         loaded: false,
         error: action.error
       });
-    case LOGIN:
+    case _constants.AUTH_LOGIN:
       return (0, _extends3.default)({}, state, {
         loggingIn: true
       });
-    case LOGIN_SUCCESS:
+    case _constants.AUTH_LOGIN_SUCCESS:
       return (0, _extends3.default)({}, state, {
         loggingIn: false,
         user: action.result
       });
-    case LOGIN_FAIL:
+    case _constants.AUTH_LOGIN_FAIL:
       return (0, _extends3.default)({}, state, {
         loggingIn: false,
         user: null,
         loginError: action.error
       });
-    case LOGOUT:
+    case _constants.AUTH_LOGOUT:
       return (0, _extends3.default)({}, state, {
         loggingOut: true
       });
-    case LOGOUT_SUCCESS:
+    case _constants.AUTH_LOGOUT_SUCCESS:
       return (0, _extends3.default)({}, state, {
         loggingOut: false,
         user: null
       });
-    case LOGOUT_FAIL:
+    case _constants.AUTH_LOGOUT_FAIL:
       return (0, _extends3.default)({}, state, {
         loggingOut: false,
         logoutError: action.error
@@ -91,7 +83,7 @@ function isLoaded(globalState) {
 
 function load() {
   return {
-    types: [LOAD, LOAD_SUCCESS, LOAD_FAIL],
+    types: [_constants.AUTH_LOAD, _constants.AUTH_LOAD_SUCCESS, _constants.AUTH_LOAD_FAIL],
     promise: function promise(client) {
       return client.get('/loadAuth');
     }
@@ -100,7 +92,7 @@ function load() {
 
 function login(name) {
   return {
-    types: [LOGIN, LOGIN_SUCCESS, LOGIN_FAIL],
+    types: [_constants.AUTH_LOGIN, _constants.AUTH_LOGIN_SUCCESS, _constants.AUTH_LOGIN_FAIL],
     promise: function promise(client) {
       return client.post('/login', {
         data: {
@@ -113,7 +105,7 @@ function login(name) {
 
 function logout() {
   return {
-    types: [LOGOUT, LOGOUT_SUCCESS, LOGOUT_FAIL],
+    types: [_constants.AUTH_LOGOUT, _constants.AUTH_LOGOUT_SUCCESS, _constants.AUTH_LOGOUT_FAIL],
     promise: function promise(client) {
       return client.get('/logout');
     }

@@ -36,15 +36,21 @@ var _reactTransformCatchErrors3 = require('react-transform-catch-errors');
 
 var _reactTransformCatchErrors4 = _interopRequireDefault(_reactTransformCatchErrors3);
 
-var _dec, _class, _class2, _temp2;
+var _reactDom = require('react-dom');
 
-var _reactRedux = require('react-redux');
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
+var _three = require('three');
+
+var THREE = _interopRequireWildcard(_three);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var _components = {
-  Chat: {
-    displayName: 'Chat'
+  Editor: {
+    displayName: 'Editor'
   }
 };
 
@@ -61,57 +67,136 @@ function _wrapComponent(id) {
   };
 }
 
-var Chat = _wrapComponent('Chat')((_dec = (0, _reactRedux.connect)(function (state) {
-  return { user: state.auth.user };
-}), _dec(_class = (_temp2 = _class2 = function (_Component) {
-  (0, _inherits3.default)(Chat, _Component);
+var Editor = _wrapComponent('Editor')(function (_Component) {
+  (0, _inherits3.default)(Editor, _Component);
 
-  function Chat() {
-    var _ref;
+  function Editor(props) {
+    (0, _classCallCheck3.default)(this, Editor);
 
-    var _temp, _this, _ret;
+    var _this = (0, _possibleConstructorReturn3.default)(this, (Editor.__proto__ || (0, _getPrototypeOf2.default)(Editor)).call(this, props));
 
-    (0, _classCallCheck3.default)(this, Chat);
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Chat.__proto__ || (0, _getPrototypeOf2.default)(Chat)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
-      message: '',
-      messages: []
-    }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
+    _this.needRender = false;
+    _this.objects = [];
+    _this.targets = { table: [] };
+    return _this;
   }
 
-  (0, _createClass3.default)(Chat, [{
+  (0, _createClass3.default)(Editor, [{
     key: 'componentDidMount',
-    value: function componentDidMount() {}
+    value: function componentDidMount() {
+      this.init();
+      window.addEventListener('resize', this.updateCameraAspect.bind(this));
+    }
   }, {
     key: 'componentWillUnmount',
-    value: function componentWillUnmount() {}
+    value: function componentWillUnmount() {
+      if (this.request) {
+        cancelAnimationFrame(this.request);
+      }
+
+      window.removeEventListener('resize', this.updateCameraAspect.bind(this));
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      this.initContainer();
+      this.initScene();
+      this.initCamera();
+      this.initControls();
+      this.initRenderer();
+      this.loadScene();
+      this.animate();
+    }
+  }, {
+    key: 'initContainer',
+    value: function initContainer() {
+      this.container = _reactDom2.default.findDOMNode(this);
+      this.updateAspect();
+    }
+  }, {
+    key: 'initScene',
+    value: function initScene() {
+      this.scene = new THREE.Scene();
+    }
+  }, {
+    key: 'initCamera',
+    value: function initCamera() {
+      this.camera = new THREE.PerspectiveCamera(45, this.aspect.width / this.aspect.height, 1, 10000);
+      this.camera.position.z = 3000;
+    }
+  }, {
+    key: 'initControls',
+    value: function initControls() {}
+  }, {
+    key: 'initRenderer',
+    value: function initRenderer() {
+      // renderer
+      this.renderer = new THREE.WebGLRenderer();
+
+      this.updateCameraAspect();
+      this.renderWebGL();
+    }
+  }, {
+    key: 'loadScene',
+    value: function loadScene() {
+      this.requestRender();
+    }
+  }, {
+    key: 'updateAspect',
+    value: function updateAspect() {
+      this.aspect = {
+        width: this.container.clientWidth,
+        height: window.innerHeight
+      };
+    }
+  }, {
+    key: 'updateCameraAspect',
+    value: function updateCameraAspect() {
+      if (this.renderer === null) return;
+
+      this.updateAspect();
+      this.camera.aspect = this.aspect.width / this.aspect.height;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(this.aspect.width, this.aspect.height);
+      this.requestRender();
+    }
+  }, {
+    key: 'requestRender',
+    value: function requestRender() {
+      this.needRender = true;
+    }
+  }, {
+    key: 'animate',
+    value: function animate() {
+      this.request = requestAnimationFrame(this.animate.bind(this));
+
+      if (this.needRender) {
+        this.renderWebGL();
+        this.needRender = false;
+      }
+    }
+  }, {
+    key: 'renderWebGL',
+    value: function renderWebGL() {
+      console.log('render');
+      this.renderer.render(this.scene, this.camera);
+    }
   }, {
     key: 'render',
     value: function render() {
-      var user = this.props.user;
-
-
-      return _react3.default.createElement(
-        'div',
-        { className: 'container' },
-        _react3.default.createElement(
-          'h1',
-          { className: style },
-          'Editor'
-        )
-      );
+      return _react3.default.createElement('div', { id: 'canvas-container' });
     }
   }]);
-  return Chat;
-}(_react2.Component), _class2.propTypes = {
-  user: _react2.PropTypes.object
-}, _temp2)) || _class));
+  return Editor;
+}(_react2.Component));
 
-exports.default = Chat;
+Editor.propTypes = {
+  needRenderer: _react2.PropTypes.bool,
+  objects: _react2.PropTypes.array,
+  targets: _react2.PropTypes.object
+};
+
+exports.default = Editor;
 module.exports = exports['default'];
 
 //# sourceMappingURL=Editor-compiled.js.map

@@ -21,13 +21,24 @@ var _immutable = require('immutable');
 
 var _immutable2 = _interopRequireDefault(_immutable);
 
+var _reduxSaga = require('redux-saga');
+
+var _reduxSaga2 = _interopRequireDefault(_reduxSaga);
+
+var _sagas = require('./sagas');
+
+var _sagas2 = _interopRequireDefault(_sagas);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function createStore(history, client, data) {
   // Sync dispatched route actions to the history
   var reduxRouterMiddleware = (0, _reactRouterRedux.routerMiddleware)(history);
 
-  var middleware = [(0, _clientMiddleware2.default)(client), reduxRouterMiddleware, _reduxThunk2.default];
+  // create the saga middleware
+  var sagaMiddleware = (0, _reduxSaga2.default)();
+
+  var middleware = [(0, _clientMiddleware2.default)(client), reduxRouterMiddleware, _reduxThunk2.default, sagaMiddleware];
 
   var finalCreateStore = void 0;
   if (__DEVELOPMENT__ && __CLIENT__ && __DEVTOOLS__) {
@@ -45,6 +56,9 @@ function createStore(history, client, data) {
     data.pagination = _immutable2.default.fromJS(data.pagination);
   }
   var store = finalCreateStore(reducer, data);
+
+  // then run the saga
+  sagaMiddleware.run(_sagas2.default);
 
   if (__DEVELOPMENT__ && module.hot) {
     module.hot.accept('./modules/reducer', function () {

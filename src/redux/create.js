@@ -3,12 +3,17 @@ import createMiddleware from './middleware/clientMiddleware';
 import { routerMiddleware } from 'react-router-redux';
 import thunk from 'redux-thunk';
 import Immutable from 'immutable';
+import createSagaMiddleware from 'redux-saga';
+import rootSaga from './sagas';
 
 export default function createStore(history, client, data) {
   // Sync dispatched route actions to the history
   const reduxRouterMiddleware = routerMiddleware(history);
 
-  const middleware = [createMiddleware(client), reduxRouterMiddleware, thunk];
+  // create the saga middleware
+  const sagaMiddleware = createSagaMiddleware();
+
+  const middleware = [createMiddleware(client), reduxRouterMiddleware, thunk, sagaMiddleware];
 
   let finalCreateStore;
   if (__DEVELOPMENT__ && __CLIENT__ && __DEVTOOLS__) {
@@ -29,6 +34,8 @@ export default function createStore(history, client, data) {
   }
   const store = finalCreateStore(reducer, data);
 
+  // then run the saga
+  sagaMiddleware.run(rootSaga);
 
   if (__DEVELOPMENT__ && module.hot) {
     module.hot.accept('./modules/reducer', () => {
