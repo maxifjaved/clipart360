@@ -68,7 +68,9 @@ app.use((req, res) => {
   }
   const client = new ApiClient(req);
   const memoryHistory = createHistory(req.originalUrl);
-  const store = createStore(memoryHistory, client);
+  const created = createStore(memoryHistory, client);
+  const store = created.store;
+  const rootSagaTask = created.rootSagaTask;
   const history = syncHistoryWithStore(memoryHistory, store);
 
   function hydrateOnClient() {
@@ -81,7 +83,9 @@ app.use((req, res) => {
     return;
   }
 
+
   match({ history, routes: getRoutes(store), location: req.originalUrl }, (error, redirectLocation, renderProps) => {
+    console.log('server2', redirectLocation, rootSagaTask.done);
     if (redirectLocation) {
       res.redirect(redirectLocation.pathname + redirectLocation.search);
     } else if (error) {
@@ -90,6 +94,8 @@ app.use((req, res) => {
       hydrateOnClient();
     } else if (renderProps) {
       loadOnServer({...renderProps, store, helpers: {client}}).then(() => {
+        const { auth: { user }} = store.getState();
+        console.log('server', user);
         const component = (
           <Provider store={store} key="provider">
             <ReduxAsyncConnect {...renderProps} />
@@ -100,13 +106,18 @@ app.use((req, res) => {
 
         global.navigator = {userAgent: req.headers['user-agent']};
 
-        res.send('<!doctype html>\n' +
-          ReactDOM.renderToString(<Html assets={webpackIsomorphicTools.assets()} component={component} store={store}/>));
+        function renderToString() {
+          res.send('<!doctype html>\n' +
+            ReactDOM.renderToString(<Html assets={webpackIsomorphicTools.assets()} component={component} store={store}/>));
+        }
+        //  rootSagaTask.done.then(renderToString);
+        renderToString();
       });
     } else {
       res.status(404).send('Not found');
     }
   });
+
 });
 
 if (config.port) {

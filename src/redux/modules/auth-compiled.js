@@ -9,10 +9,6 @@ var _extends2 = require('babel-runtime/helpers/extends');
 var _extends3 = _interopRequireDefault(_extends2);
 
 exports.default = reducer;
-exports.isLoaded = isLoaded;
-exports.load = load;
-exports.login = login;
-exports.logout = logout;
 
 var _constants = require('../constants');
 
@@ -27,17 +23,23 @@ function reducer() {
   var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   switch (action.type) {
-    case _constants.AUTH_LOAD:
+    case _constants.AUTH_LOAD_AUTH:
       return (0, _extends3.default)({}, state, {
         loading: true
       });
-    case _constants.AUTH_LOAD_SUCCESS:
+    case _constants.AUTH_LOAD_AUTH_SUCCESS:
       return (0, _extends3.default)({}, state, {
         loading: false,
         loaded: true,
         user: action.result
       });
-    case _constants.AUTH_LOAD_FAIL:
+    case _constants.AUTH_LOAD_AUTH_NULL:
+      return (0, _extends3.default)({}, state, {
+        loading: false,
+        loaded: false,
+        user: null
+      });
+    case _constants.AUTH_LOAD_AUTH_FAIL:
       return (0, _extends3.default)({}, state, {
         loading: false,
         loaded: false,
@@ -76,40 +78,6 @@ function reducer() {
       return state;
   }
 }
-
-function isLoaded(globalState) {
-  return globalState.auth && globalState.auth.loaded;
-}
-
-function load() {
-  return {
-    types: [_constants.AUTH_LOAD, _constants.AUTH_LOAD_SUCCESS, _constants.AUTH_LOAD_FAIL],
-    promise: function promise(client) {
-      return client.get('/loadAuth');
-    }
-  };
-}
-
-function login(name) {
-  return {
-    types: [_constants.AUTH_LOGIN, _constants.AUTH_LOGIN_SUCCESS, _constants.AUTH_LOGIN_FAIL],
-    promise: function promise(client) {
-      return client.post('/login', {
-        data: {
-          name: name
-        }
-      });
-    }
-  };
-}
-
-function logout() {
-  return {
-    types: [_constants.AUTH_LOGOUT, _constants.AUTH_LOGOUT_SUCCESS, _constants.AUTH_LOGOUT_FAIL],
-    promise: function promise(client) {
-      return client.get('/logout');
-    }
-  };
-}
+module.exports = exports['default'];
 
 //# sourceMappingURL=auth-compiled.js.map

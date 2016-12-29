@@ -35,7 +35,7 @@ export default function createStore(history, client, data) {
   const store = finalCreateStore(reducer, data);
 
   // then run the saga
-  sagaMiddleware.run(rootSaga);
+  const rootTask = sagaMiddleware.run(rootSaga, client);
 
   if (__DEVELOPMENT__ && module.hot) {
     module.hot.accept('./modules/reducer', () => {
@@ -43,5 +43,5 @@ export default function createStore(history, client, data) {
     });
   }
 
-  return store;
+  return {store, rootSagaTask: rootTask};
 }

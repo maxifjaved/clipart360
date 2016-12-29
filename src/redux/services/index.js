@@ -24,21 +24,5 @@ export const api = {
     return new Promise( (resolve) =>
       setTimeout(() => resolve(), TIMEOUT)
     );
-  },
-
-  loadUser(name) {
-    return {
-      promise: (client) => client.post('/login', {
-        data: {
-          name: name
-        }
-      })
-    };
-  },
-
-  logout() {
-    return {
-      promise: (client) => client.get('/logout')
-    };
   }
 };

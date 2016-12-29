@@ -10,7 +10,7 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRouter = require('react-router');
 
-var _auth = require('redux/modules/auth');
+var _actions = require('./redux/actions');
 
 var _containers = require('containers');
 
@@ -22,18 +22,18 @@ exports.default = function (store) {
       var _store$getState = store.getState(),
           user = _store$getState.auth.user;
 
+      console.log('app', user);
       if (!user) {
         // oops, not logged in, so can't be here!
         replace('/login');
       }
       cb();
     }
-
-    if (!(0, _auth.isLoaded)(store.getState())) {
-      store.dispatch((0, _auth.load)()).then(checkAuth);
-    } else {
-      checkAuth();
+    console.log('app1', store.getState().auth.loaded);
+    if (!store.getState().auth.loaded) {
+      (0, _actions.loadAuth)();
     }
+    checkAuth();
   };
 
   /**

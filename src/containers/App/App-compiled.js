@@ -24,10 +24,6 @@ var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
-var _promise = require('babel-runtime/core-js/promise');
-
-var _promise2 = _interopRequireDefault(_promise);
-
 var _redboxReact2 = require('redbox-react');
 
 var _redboxReact3 = _interopRequireDefault(_redboxReact2);
@@ -40,7 +36,7 @@ var _reactTransformCatchErrors3 = require('react-transform-catch-errors');
 
 var _reactTransformCatchErrors4 = _interopRequireDefault(_reactTransformCatchErrors3);
 
-var _dec, _dec2, _class, _class2, _temp2;
+var _dec, _class, _class2, _temp2;
 
 var _reactRedux = require('react-redux');
 
@@ -64,9 +60,7 @@ var _reactHelmet = require('react-helmet');
 
 var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
 
-var _info = require('redux/modules/info');
-
-var _auth = require('redux/modules/auth');
+var _actions = require('../../redux/actions');
 
 var _components2 = require('components');
 
@@ -75,8 +69,6 @@ var _reactRouterRedux = require('react-router-redux');
 var _config = require('../../config');
 
 var _config2 = _interopRequireDefault(_config);
-
-var _reduxAsyncConnect = require('redux-async-connect');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -99,30 +91,13 @@ function _wrapComponent(id) {
   };
 }
 
-var App = _wrapComponent('App')((_dec = (0, _reduxAsyncConnect.asyncConnect)([{
-  promise: function promise(_ref) {
-    var _ref$store = _ref.store,
-        dispatch = _ref$store.dispatch,
-        getState = _ref$store.getState;
-
-    var promises = [];
-
-    if (!(0, _info.isLoaded)(getState())) {
-      promises.push(dispatch((0, _info.load)()));
-    }
-    if (!(0, _auth.isLoaded)(getState())) {
-      promises.push(dispatch((0, _auth.load)()));
-    }
-
-    return _promise2.default.all(promises);
-  }
-}]), _dec2 = (0, _reactRedux.connect)(function (state) {
-  return { user: state.auth.user };
-}, { logout: _auth.logout, pushState: _reactRouterRedux.push }), _dec(_class = _dec2(_class = (_temp2 = _class2 = function (_Component) {
+var App = _wrapComponent('App')((_dec = (0, _reactRedux.connect)(function (state) {
+  return { user: state.auth.user, isInfoLoaded: state.info.loaded, isAuthLoaded: state.auth.loaded };
+}, { logout: _actions.logout, loadInfo: _actions.loadInfo, loadAuth: _actions.loadAuth, pushState: _reactRouterRedux.push }), _dec(_class = (_temp2 = _class2 = function (_Component) {
   (0, _inherits3.default)(App, _Component);
 
   function App() {
-    var _ref2;
+    var _ref;
 
     var _temp, _this, _ret;
 
@@ -132,21 +107,20 @@ var App = _wrapComponent('App')((_dec = (0, _reduxAsyncConnect.asyncConnect)([{
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref2 = App.__proto__ || (0, _getPrototypeOf2.default)(App)).call.apply(_ref2, [this].concat(args))), _this), _this.handleLogout = function (event) {
+    return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = App.__proto__ || (0, _getPrototypeOf2.default)(App)).call.apply(_ref, [this].concat(args))), _this), _this.handleLogout = function (event) {
       event.preventDefault();
       _this.props.logout();
     }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
   }
 
   (0, _createClass3.default)(App, [{
-    key: 'componentWillReceiveProps',
-    value: function componentWillReceiveProps(nextProps) {
-      if (!this.props.user && nextProps.user) {
-        // login
-        this.props.pushState('/loginSuccess');
-      } else if (this.props.user && !nextProps.user) {
-        // logout
-        this.props.pushState('/');
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      if (!this.props.isInfoLoaded) {
+        this.props.loadInfo();
+      }
+      if (!this.props.isAuthLoaded) {
+        this.props.loadAuth();
       }
     }
   }, {
@@ -317,10 +291,14 @@ var App = _wrapComponent('App')((_dec = (0, _reduxAsyncConnect.asyncConnect)([{
   children: _react2.PropTypes.object.isRequired,
   user: _react2.PropTypes.object,
   logout: _react2.PropTypes.func.isRequired,
+  loadInfo: _react2.PropTypes.func.isRequired,
+  loadAuth: _react2.PropTypes.func.isRequired,
+  isInfoLoaded: _react2.PropTypes.bool.isRequired,
+  isAuthLoaded: _react2.PropTypes.bool.isRequired,
   pushState: _react2.PropTypes.func.isRequired
 }, _class2.contextTypes = {
   store: _react2.PropTypes.object.isRequired
-}, _temp2)) || _class) || _class));
+}, _temp2)) || _class));
 
 exports.default = App;
 module.exports = exports['default'];

@@ -1,6 +1,8 @@
-const LOAD = 'redux-example/LOAD';
-const LOAD_SUCCESS = 'redux-example/LOAD_SUCCESS';
-const LOAD_FAIL = 'redux-example/LOAD_FAIL';
+import {
+  AUTH_LOAD_INFO,
+  AUTH_LOAD_INFO_SUCCESS,
+  AUTH_LOAD_INFO_FAIL
+} from '../constants';
 
 const initialState = {
   loaded: false
@@ -8,19 +10,19 @@ const initialState = {
 
 export default function info(state = initialState, action = {}) {
   switch (action.type) {
-    case LOAD:
+    case AUTH_LOAD_INFO:
       return {
         ...state,
         loading: true
       };
-    case LOAD_SUCCESS:
+    case AUTH_LOAD_INFO_SUCCESS:
       return {
         ...state,
         loading: false,
         loaded: true,
         data: action.result
       };
-    case LOAD_FAIL:
+    case AUTH_LOAD_INFO_FAIL:
       return {
         ...state,
         loading: false,
@@ -30,15 +32,4 @@ export default function info(state = initialState, action = {}) {
     default:
       return state;
   }
-}
-
-export function isLoaded(globalState) {
-  return globalState.info && globalState.info.loaded;
-}
-
-export function load() {
-  return {
-    types: [LOAD, LOAD_SUCCESS, LOAD_FAIL],
-    promise: (client) => client.get('/loadInfo')
-  };
 }

@@ -52,7 +52,8 @@ var _browserHistory = (0, _useStandardScroll2.default)(function () {
   return _reactRouter.browserHistory;
 })();
 var dest = document.getElementById('content');
-var store = (0, _create2.default)(_browserHistory, client, window.__data);
+var created = (0, _create2.default)(_browserHistory, client, window.__data);
+var store = created.store;
 var history = (0, _reactRouterRedux.syncHistoryWithStore)(_browserHistory, store);
 
 function initSocket() {

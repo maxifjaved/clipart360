@@ -1,13 +1,14 @@
 import {
-  AUTH_LOAD,
-  AUTH_LOAD_SUCCESS,
-  AUTH_LOAD_FAIL,
+  AUTH_LOAD_AUTH,
+  AUTH_LOAD_AUTH_SUCCESS,
+  AUTH_LOAD_AUTH_FAIL,
   AUTH_LOGIN,
   AUTH_LOGIN_SUCCESS,
   AUTH_LOGIN_FAIL,
   AUTH_LOGOUT,
   AUTH_LOGOUT_SUCCESS,
-  AUTH_LOGOUT_FAIL
+  AUTH_LOGOUT_FAIL,
+  AUTH_LOAD_AUTH_NULL
 } from '../constants';
 
 const initialState = {
@@ -16,19 +17,26 @@ const initialState = {
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
-    case AUTH_LOAD:
+    case AUTH_LOAD_AUTH:
       return {
         ...state,
         loading: true
       };
-    case AUTH_LOAD_SUCCESS:
+    case AUTH_LOAD_AUTH_SUCCESS:
       return {
         ...state,
         loading: false,
         loaded: true,
         user: action.result
       };
-    case AUTH_LOAD_FAIL:
+    case AUTH_LOAD_AUTH_NULL:
+      return {
+        ...state,
+        loading: false,
+        loaded: false,
+        user: null
+      };
+    case AUTH_LOAD_AUTH_FAIL:
       return {
         ...state,
         loading: false,
@@ -75,31 +83,3 @@ export default function reducer(state = initialState, action = {}) {
   }
 }
 
-export function isLoaded(globalState) {
-  return globalState.auth && globalState.auth.loaded;
-}
-
-export function load() {
-  return {
-    types: [AUTH_LOAD, AUTH_LOAD_SUCCESS, AUTH_LOAD_FAIL],
-    promise: (client) => client.get('/loadAuth')
-  };
-}
-
-export function login(name) {
-  return {
-    types: [AUTH_LOGIN, AUTH_LOGIN_SUCCESS, AUTH_LOGIN_FAIL],
-    promise: (client) => client.post('/login', {
-      data: {
-        name: name
-      }
-    })
-  };
-}
-
-export function logout() {
-  return {
-    types: [AUTH_LOGOUT, AUTH_LOGOUT_SUCCESS, AUTH_LOGOUT_FAIL],
-    promise: (client) => client.get('/logout')
-  };
-}
